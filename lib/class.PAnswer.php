@@ -17,6 +17,8 @@ class PAnswer extends MCFObject
         'position' => 'I'
     );
 
+    protected static $table_fields_indexes = array('question_id', 'position');
+
     const TABLE_NAME = 'module_paul_answers';
 
     /**

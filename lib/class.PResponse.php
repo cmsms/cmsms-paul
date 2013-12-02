@@ -23,6 +23,21 @@ class PResponse extends MCFObject
         'response_key' => 'C(255)' // Key to identify the respondent
     );
 
+    protected static $table_fields_indexes = array('question_id', 'answer_id');
+
+    protected static $table_relations = array(
+        'question' => array(
+            'local' => 'question_id',
+            'remote' => 'id',
+            'class' => 'PQuestion'
+        ),
+        'answer' => array(
+            'local' => 'answer_id',
+            'remote' => 'id',
+            'class' => 'PAnswer'
+        )
+    );
+
     const TABLE_NAME = 'module_paul_responses';
 
     /**

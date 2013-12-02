@@ -4,10 +4,16 @@ class PQuestion extends MCFObject
 {
     protected $name;
     protected $description;
-    protected $is_active;
+    protected $is_active = false;
     protected $is_multiple;
 
     protected $answers;
+
+    /**
+     * Contain $actions links that can be executed in a template (when loaded)
+     * @var
+     */
+    public $actions = array();
 
     public static $table_fields = array(
         'name' => 'C(255)',
@@ -97,5 +103,17 @@ class PQuestion extends MCFObject
         $c->add('question_id', $this->getId());
         $c->addAscendingOrderByColumn('position');
         return PAnswer::doSelect($c);
+    }
+
+    public function countAnswers()
+    {
+        if($this->getAnswers())
+        {
+            return count($this->getAnswers());
+        }
+        else
+        {
+            return 0;
+        }
     }
 }
