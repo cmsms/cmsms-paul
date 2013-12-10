@@ -10,6 +10,14 @@ class PAnswer extends MCFObject
     /** @var PQuestion $question */
     protected $question;
 
+    /** @var array $responses */
+    protected $responses;
+    /**
+     * Contain $actions links that can be executed in a template (when loaded)
+     * @var
+     */
+    public $actions = array();
+
     protected static $table_fields = array(
         'name' => 'C(255)',
         'description' => 'XL',
@@ -118,4 +126,45 @@ class PAnswer extends MCFObject
         if(empty($this->question)) $this->question = PQuestion::retrieveByPk($this->question_id);
         return $this->question;
     }
+
+    /**
+     * @param array $responses
+     */
+    public function setResponses($responses)
+    {
+        $this->responses = $responses;
+    }
+
+    /**
+     * @return array
+     */
+    public function getResponses()
+    {
+        if(empty($this->responses)) $this->responses = $this->loadResponses();
+        return $this->responses;
+    }
+
+    /**
+     * @return array
+     */
+    private function loadResponses()
+    {
+        $c = new MCFCriteria();
+        $c->add('answer_id', $this->getId());
+        return PResponse::doSelect($c);
+    }
+
+    /**
+     * @return int
+     */
+    public function countResponses()
+    {
+        return count($this->getResponses());
+    }
+
+    public function addResponse($response_key = null)
+    {
+        return PResponse::addResponse($this, $response_key);
+    }
+
 }

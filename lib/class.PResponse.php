@@ -46,6 +46,7 @@ class PResponse extends MCFObject
     public function setAnswer(PAnswer $answer)
     {
         $this->answer = $answer;
+        $this->setQuestion($answer->getQuestion());
         $this->answer_id = $answer->getId();
     }
 
@@ -54,7 +55,7 @@ class PResponse extends MCFObject
      */
     public function getAnswer()
     {
-        if(empty($this->answer)) $this->answer = PAnswer::retrieveByPk($this->answer_id);
+        if (empty($this->answer)) $this->answer = PAnswer::retrieveByPk($this->answer_id);
         return $this->answer;
     }
 
@@ -97,11 +98,9 @@ class PResponse extends MCFObject
      */
     public function getQuestion()
     {
-        if(empty($this->question))
-        {
+        if (empty($this->question)) {
             $this->question = PQuestion::retrieveByPk($this->question_id);
-            if($this->question->getId() != $this->getAnswer()->getQuestion()->getId())
-            {
+            if ($this->question->getId() != $this->getAnswer()->getQuestion()->getId()) {
                 throw new Exception('Inconsistent in the PResponse ' . $this->getId() . ' between response\'s question and answer\'s question');
             }
         }
@@ -133,6 +132,74 @@ class PResponse extends MCFObject
         return $this->response_key;
     }
 
+    public static function userHasResponses($user_id, $question_id)
+    {
+        $c = new MCFCriteria();
+        $c->add('question_id', $question_id);
+        $c->add('response_key', $user_id);
 
+        if ($response = self::doSelectOne($c)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static function retrieveCurrentUser()
+    {
+        // CMS Users
+        if ($cmsusers = cms_utils::get_module('CMSUsers')) {
+            /** @var CMSUsers $cmsusers */
+            if ($user = $cmsusers->getUser()) {
+                return 'cmsuser_' . $user->getId();
+            }
+
+        }
+        // Cookie
+        if (!isset($_COOKIE['cmsms_paul_user'])) {
+            $key = 'cmsms_paul_' . time() . '_' . uniqid();
+            setcookie('cmsms_paul_user', $key, strtotime('+ 10 years'));
+            $_COOKIE['cmsms_paul_user'] = $key;
+            return $key;
+        } else {
+            return $_COOKIE['cmsms_paul_user'];
+        }
+    }
+
+    public static function addResponse(PAnswer $answer, $response_key = null)
+    {
+        if (is_null($response_key)) {
+            $response_key = self::retrieveCurrentUser();
+        }
+
+        $c = new MCFCriteria();
+        $c->add('answer_id', $answer->getId());
+        $c->add('response_key', $response_key);
+        $response = self::doSelectOne($c);
+        if (!$response) {
+            $response = new PResponse();
+            $response->setAnswer($answer);
+            $response->setResponseKey($response_key);
+            $response->save();
+        }
+
+        return $response;
+    }
+
+    public static function cleanResponses(PQuestion $question, $response_key = null)
+    {
+        if (is_null($response_key)) {
+            $response_key = self::retrieveCurrentUser();
+        }
+
+        $c = new MCFCriteria();
+        $c->add('question_id', $question->getId());
+        $c->add('response_key', $response_key);
+        $responses = self::doSelect($c);
+
+        foreach ($responses as $response) {
+            /** @var PResponse $response */
+            $response->delete();
+        }
+    }
 
 }

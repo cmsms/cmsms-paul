@@ -1,6 +1,7 @@
 <?php
 
-class Paul extends CMSModule {
+class Paul extends CMSModule
+{
 
     public function GetName()
     {
@@ -90,4 +91,70 @@ class Paul extends CMSModule {
 //        $module = cms_utils::get_module('Paul');
 //        return $module->CreateLink($id, $action, $returnid, '', $params, '', true);
 //    }
+
+    /**
+     * This function return the right template resource regarding default and override parameters
+     *
+     * @param string $template The default template name
+     * @param array $params   The action parameters (to catch the params['template'])
+     *
+     * @return null|string
+     */
+
+    public function getTemplateResource($template, $params)
+    {
+        if (isset($params['template'])) {
+            $template = trim($params['template']);
+        }
+
+        if ($this->GetTemplate($template) != '') {
+            return $this->GetDatabaseResource($template);
+        }
+
+        if ($resource = $this->GetDefaultTemplate($template)) {
+            return $this->GetDatabaseResource($resource);
+        }
+
+        if (is_file($this->GetModulePath() . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'frontend.' . $template . '.tpl')) {
+            return $this->GetFileResource('frontend.' . $template . '.tpl');
+        }
+
+        return NULL;
+    }
+
+    /**
+     * Get the list of the default templates
+     * @return array
+     */
+
+    public function GetDefaultTemplates()
+    {
+        $array = unserialize($this->GetPreference('default_templates'));
+        if (is_array($array)) {
+            return $array;
+        }
+
+        return array();
+    }
+
+    /**
+     * Get the default template for an action
+     *
+     * @param string $action The action who have a default template
+     *
+     * @return string|bool
+     */
+
+    public function GetDefaultTemplate($action)
+    {
+
+
+        $list = $this->GetDefaultTemplates();
+        if (!is_array($list)) $list = array();
+        if (array_key_exists($action, $list)) {
+            return $list[$action];
+        } else {
+            return false;
+        }
+    }
 }

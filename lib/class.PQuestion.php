@@ -89,14 +89,25 @@ class PQuestion extends MCFObject
     }
 
     /**
-     * @return mixed
+     * @param array $answers
+     */
+    public function setAnswers($answers)
+    {
+        $this->answers = $answers;
+    }
+
+    /**
+     * @return array
      */
     public function getAnswers()
     {
-        if(empty($this->answers)) $this->answers = $this->loadAnswers();
+        if (empty($this->answers)) $this->answers = $this->loadAnswers();
         return $this->answers;
     }
 
+    /**
+     * @return array
+     */
     private function loadAnswers()
     {
         $c = new MCFCriteria();
@@ -105,15 +116,23 @@ class PQuestion extends MCFObject
         return PAnswer::doSelect($c);
     }
 
+    /**
+     * @return int
+     */
     public function countAnswers()
     {
-        if($this->getAnswers())
-        {
+        if ($this->getAnswers()) {
             return count($this->getAnswers());
-        }
-        else
-        {
+        } else {
             return 0;
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasAnswers()
+    {
+        return (bool)$this->countAnswers();
     }
 }

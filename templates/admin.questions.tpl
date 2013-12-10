@@ -21,6 +21,11 @@
                 <td>{if $question->getIsMultiple()}true{else}false{/if}</td>
                 <td>{$question->countAnswers()}</td>
                 <td>
+                    {if $question->getIsActive()}
+                        <a href="{$question->actions.activation}">Unpublish</a>
+                        {else}
+                        <a href="{$question->actions.activation}">Publish</a>
+                    {/if}
                     <a href="{$question->actions.edit}">Edit</a>
                 </td>
             </tr>
