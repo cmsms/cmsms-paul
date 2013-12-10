@@ -9,6 +9,7 @@
         <thead>
         <tr>
             <th>Question</th>
+            <th>Smarty</th>
             <th>Multiple</th>
             <th>Answers</th>
             <th class="pageincon"></th>
@@ -18,6 +19,7 @@
         {foreach from=$questions item=question}
             <tr>
                 <td><a href="{$question->actions.edit}">{$question->getName()}</a></td>
+                <td>{ldelim}Paul question_id="{$question->getId()}"{rdelim}</td>
                 <td>{if $question->getIsMultiple()}true{else}false{/if}</td>
                 <td>{$question->countAnswers()}</td>
                 <td>

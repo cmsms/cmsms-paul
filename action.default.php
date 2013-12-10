@@ -10,44 +10,44 @@ $template_resource = $this->getTemplateResource('poll', $params);
 if (!$smarty->isCached($template_resource, $cache_id, $compile_id)) {
     $c = new MCFCriteria();
     $c->add('is_active', true);
+    if(isset($params['question_id']))
+    {
+        $c->add('id', $params['question_id']);
+    }
     $c->addDescendingOrderByColumn('created_at');
     /** @var PQuestion $question */
     $question = PQuestion::doSelectOne($c);
 
-    if($question)
-    {
+    if ($question) {
         $user_key = PResponse::retrieveCurrentUser();
 
-        if(!PResponse::userHasResponses($question->getId(), $user_key))
-        {
+        var_dump($user_key);
+        var_dump(PResponse::userHasResponses($question, $user_key));
+
+        if (!PResponse::userHasResponses($question, $user_key)) {
             $form = new CMSForm($this->GetName(), $id, 'answer', $returnid);
             $form->setButtons(array('submit'));
             $form->setLabel('submit', 'Participate');
-            $form->setWidget('question_id', 'hidden');
+            $form->setWidget('question_id', 'hidden', array('value' => $question->getId()));
 
             $answers_form = array();
-            foreach($question->getAnswers() as $answer)
-            {
+            foreach ($question->getAnswers() as $answer) {
                 /** @var PAnswer $answer */
                 $answers_form[$answer->getId()] = $answer->getName();
             }
 
-            if($question->getIsMultiple())
-            {
+            if ($question->getIsMultiple()) {
                 $form->setWidget('answers', 'select', array('label' => '', 'values' => $answers_form, 'expanded' => true, 'multiple' => true));
-            }
-            else
-            {
+            } else {
                 $form->setWidget('answers', 'select', array('label' => '', 'values' => $answers_form, 'expanded' => true));
             }
 
             $smarty->assign('form', $form);
-        }
-        else
-        {
+        } else {
             $params['question_id'] = $question->getId();
             unset($params['action']);
-            $this->DoAction('answer', $id, $params, $returnid);
+            echo $this->DoAction('answer', $id, $params, $returnid);
+            return;
 //            $this->Redirect($id, 'answer', $returnid, array('question_id', $question->getId()), true);
         }
 

@@ -132,10 +132,15 @@ class PResponse extends MCFObject
         return $this->response_key;
     }
 
-    public static function userHasResponses($user_id, $question_id)
+    /**
+     * @param PQuestion $question
+     * @param $user_id
+     * @return bool
+     */
+    public static function userHasResponses(PQuestion $question, $user_id)
     {
         $c = new MCFCriteria();
-        $c->add('question_id', $question_id);
+        $c->add('question_id', $question->getId());
         $c->add('response_key', $user_id);
 
         if ($response = self::doSelectOne($c)) {
@@ -144,6 +149,9 @@ class PResponse extends MCFObject
         return false;
     }
 
+    /**
+     * @return string
+     */
     public static function retrieveCurrentUser()
     {
         // CMS Users
@@ -165,6 +173,11 @@ class PResponse extends MCFObject
         }
     }
 
+    /**
+     * @param PAnswer $answer
+     * @param null $response_key
+     * @return null|PResponse
+     */
     public static function addResponse(PAnswer $answer, $response_key = null)
     {
         if (is_null($response_key)) {
@@ -185,6 +198,10 @@ class PResponse extends MCFObject
         return $response;
     }
 
+    /**
+     * @param PQuestion $question
+     * @param string|null $response_key
+     */
     public static function cleanResponses(PQuestion $question, $response_key = null)
     {
         if (is_null($response_key)) {

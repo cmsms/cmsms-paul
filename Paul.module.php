@@ -56,6 +56,8 @@ class Paul extends CMSModule
         $this->RestrictUnknownParams(true);
         $this->SetParameterType('question_id', CLEAN_INT);
         $this->SetParameterType('answer_id', CLEAN_INT);
+        $this->SetParameterType('answers', CLEAN_STRING);
+        $this->SetParameterType('submit', CLEAN_STRING);
     }
 
     public function CheckAccess()

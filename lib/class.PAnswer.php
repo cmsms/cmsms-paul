@@ -74,7 +74,7 @@ class PAnswer extends MCFObject
      */
     public function getPosition()
     {
-        if(is_null($this->position)) $this->position = $this->nextPosition();
+        if (is_null($this->position)) $this->position = $this->nextPosition();
         return $this->position;
     }
 
@@ -123,7 +123,7 @@ class PAnswer extends MCFObject
      */
     public function getQuestion()
     {
-        if(empty($this->question)) $this->question = PQuestion::retrieveByPk($this->question_id);
+        if (empty($this->question)) $this->question = PQuestion::retrieveByPk($this->question_id);
         return $this->question;
     }
 
@@ -140,7 +140,7 @@ class PAnswer extends MCFObject
      */
     public function getResponses()
     {
-        if(empty($this->responses)) $this->responses = $this->loadResponses();
+        if (empty($this->responses)) $this->responses = $this->loadResponses();
         return $this->responses;
     }
 
@@ -162,6 +162,25 @@ class PAnswer extends MCFObject
         return count($this->getResponses());
     }
 
+    /**
+     * @param int $precision
+     * @return float|int
+     */
+    public function responsesPercentage($precision = 2)
+    {
+        if ($total = $this->getQuestion()->countResponses()) {
+            $percentage = $this->countResponses() / $total * 100;
+            return round($percentage, $precision);
+        } else {
+            return 0;
+        }
+
+    }
+
+    /**
+     * @param null $response_key
+     * @return null|PResponse
+     */
     public function addResponse($response_key = null)
     {
         return PResponse::addResponse($this, $response_key);

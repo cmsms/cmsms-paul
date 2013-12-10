@@ -9,6 +9,8 @@ class PQuestion extends MCFObject
 
     protected $answers;
 
+    protected $responses;
+
     /**
      * Contain $actions links that can be executed in a template (when loaded)
      * @var
@@ -113,7 +115,10 @@ class PQuestion extends MCFObject
         $c = new MCFCriteria();
         $c->add('question_id', $this->getId());
         $c->addAscendingOrderByColumn('position');
-        return PAnswer::doSelect($c);
+        $answers = PAnswer::doSelect($c);
+        // TODO: Inject question
+        return $answers;
+
     }
 
     /**
@@ -134,5 +139,37 @@ class PQuestion extends MCFObject
     public function hasAnswers()
     {
         return (bool)$this->countAnswers();
+    }
+
+    /**
+     * @return array
+     */
+    public function getResponses()
+    {
+        if(empty($this->responses)) $this->responses = $this->loadResponses();
+        return $this->responses;
+    }
+
+    /**
+     * @return array
+     */
+    private function loadResponses()
+    {
+        $c = new MCFCriteria();
+        $c->add('question_id', $this->getId());
+        return PResponse::doSelect($c);
+    }
+
+    /**
+     * @return int
+     */
+    public function countResponses()
+    {
+        if($this->getResponses())
+        {
+            return count($this->getResponses());
+        } else {
+            return 0;
+        }
     }
 }
