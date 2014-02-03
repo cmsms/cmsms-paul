@@ -8,6 +8,11 @@ class Paul extends CMSModule
         return 'Paul';
     }
 
+    public function GetVersion()
+    {
+        return '0.0.2';
+    }
+
     public function GetFriendlyName()
     {
         return $this->GetName();
